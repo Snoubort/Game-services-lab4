@@ -19,18 +19,76 @@
 ### - 4 Практическая работа «Добавление звукового сопровождения в игре».
 ### - 5 Практическая работа «Добавление персонажа и сборка сцены для публикации на web-ресурсе».
 Ход работы:
-![Uploading MenuAnimation.gif…]()
+- Создаём на сцене объект облако
+- Делаем дубликат аниматора облака из пакета
+- Создаём анимацию движения для облака, добавляем её в аниматор
+- Аниматор присоединяем к облаку
+- На сцену меню добавляем дракона, задаём ему анимацию idle01 из набора
 ![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/MenuAnimation.gif)
-- Создаём скрипт EnergyShield
-- В скрипте щита добавляем управление щитом при помощи движения мыши
-- Создадим холст, в верхний правый угол добавим счётчик
-- При соприкосновении щита с объектом типа Dragon Egg уничтожаем яйцо, добавляем 1 к счёту
-- Пример работы игры смотри в гифке в начале задания 1
+- На стартовую сцену добавляем меню, пишем скрипт с 2-мя функциями для переключения, вешаем функционал на кнопки
+- Настройки добавляем в качестве скрываемого меню на стартовую сцену
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/StartingScene.PNG)
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/PlayButton.PNG)
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/OptionButton.PNG)
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/OptionScene.PNG)
+
+
+
+        public class MainMenu : MonoBehaviour
+        {
+            public void PlayGame(){
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
+
+            public void QuitGame(){
+                Application.Quit();
+            }
+        }
+
+
+- Добавляем обе сцены в сборку
+- Для игровой сцены делаем скрипт паузы и добвляем его в камеру
+- Скрипт останавливает течение игры
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/PauseScene.PNG)
+
+
+
+        public class Pause : MonoBehaviour
+        {
+            private bool paused = false;
+            public GameObject panel;
+
+            void Update()
+            {
+                if(Input.GetKey(KeyCode.Space)){
+                    if (!paused){
+                        Time.timeScale = 0;
+                        paused = true;
+                        panel.SetActive(true);
+                    }
+                    else{
+                        Time.timeScale = 1;
+                        paused = false;
+                        panel.SetActive(false);
+                    }
+                }
+                if(Input.GetKeyDown(KeyCode.Escape)){
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+                }
+            }
+        }
+        
+        
+- Добавляем в игру музыку, вешая AudioSource на камеру
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/Music.PNG)
+- Добавляем звуки контакта яйца с щитом и взрыва яйца при контакет с землёй(включаются в скрипте щита и яйца соотвественно)
+
 
 
         public class EnergyShield : MonoBehaviour
         {
             public TextMeshProUGUI scoreGT;
+            public AudioSource audioSource;
 
             void Start() {
                 GameObject scoreGO = GameObject.Find("Score");
@@ -55,78 +113,52 @@
                 int score = int.Parse(scoreGT.text);
                 score +=1;
                 scoreGT.text = score.ToString();
+
+                audioSource = GetComponent<AudioSource>();
+                audioSource.Play();
             }
         }
-
-
-## Задание 2
-### – 3 Практическая работа «Уменьшение жизни. Добавление текстур».
-### – 4 Практическая работа «Структурирование исходных файлов в папке».
-- В скрипте DragonPicker создаём список щитов
-- В цикл создания щитов на старте добавляем строчку с добавлением щита в ранее созданный список
-- В этом же скрипте в функцию DragonEggDestroyd добавляем код, который при падении яйца мимо щита уменьшает размер массива щитов на 1, а так же удаляет последний щит(поскольку добавлялись они по мере создания, то он же и самый большой)
-- Здесь же добавляем условие рестарта игры при 0 щитов
-- Демонстрация в гифке в первом задании
-
-
-        public class DragonPicker : MonoBehaviour
+        
+        
+        
+       public class DragonEgg : MonoBehaviour
         {
-            public GameObject energyShieldPrefab;
-            public int numEnergyShield = 3;
-            public float energyShieldBottomY = -6f;
-            public float energyShieldRadius = 1.5f;
-
-            public List<GameObject> shieldList;
+            public static float bottomY = -30f;
+            public AudioSource audioSource;
 
             void Start()
             {
-                shieldList = new List<GameObject>();
-                for (int i = 1; i<= numEnergyShield; i++){
-                    GameObject tShieldGo = Instantiate<GameObject>(energyShieldPrefab);
-                    tShieldGo.transform.position = new Vector3(0, energyShieldBottomY, 0);
-                    tShieldGo.transform.localScale = new Vector3(1*i, 1*i, 1*i);
-                    shieldList.Add(tShieldGo);
-                }
+
+            }
+
+            private void OnTriggerEnter(Collider other) {
+                ParticleSystem ps = GetComponent<ParticleSystem>();
+                var em = ps.emission;
+                em.enabled = true;
+
+                Renderer rend;
+                rend = GetComponent<Renderer>();
+                rend.enabled = false;
+
+                audioSource = GetComponent<AudioSource>();
+                audioSource.Play();
             }
 
             // Update is called once per frame
             void Update()
             {
-
-            }
-
-            public void DragonEggDestroyd(){
-                GameObject[] tDragonEggArray = GameObject.FindGameObjectsWithTag("Dragon Egg");
-                foreach (GameObject tGO in tDragonEggArray){
-                    Destroy(tGO);
-                }
-                int shieldIndex = shieldList.Count -1;
-                GameObject tShieldGo = shieldList[shieldIndex];
-                shieldList.RemoveAt(shieldIndex);
-                Destroy(tShieldGo);
-
-                if (shieldList.Count == 0){
-                    SceneManager.LoadScene("_0Scene");
+                if(transform.position.y < bottomY){
+                    Destroy(this.gameObject);
+                    DragonPicker apScript = Camera.main.GetComponent<DragonPicker>();
+                    apScript.DragonEggDestroyd();
                 }
             }
-        }
+        } 
         
-  
-- Удаляем лишние папки, создаём папки с говорящими названиями, переносим задействованный в проекте контент в них. 
-- Остальное - удаляем     
 
-![Скрин интеграция](https://github.com/Snoubort/Game-Servases-Lab3/blob/main/MatForReadMe/ClearFolder.PNG?raw=true "Интеграция")
-
+## Задание 2
+### Привести описание того, как происходит сборка проекта проекта под другие платформы. Какие могут быть особенности?
 ## Задание 3
-### – 5 Практическая работа «Интеграция игровых сервисов в готовое приложение».
-- Делаем сборку приложения, выставляя параметры(предварительно установив модуль юнити для WebGL)
-![Скрин интеграция](https://github.com/Snoubort/Game-Servases-Lab3/blob/main/MatForReadMe/BasicBuild.PNG?raw=true "Интеграция")
-- Скачиваем плагин и перетаскиваем файл в мэнеджэр пути Unity, импортируем
-- Добавляем на сцену объект YandexGame
-![Скрин интеграция](https://github.com/Snoubort/Game-Servases-Lab3/blob/main/MatForReadMe/YGObj.PNG?raw=true "Интеграция")
-- Устанавливаем дополнительные настройки, делаем билд для яндекс игр
-![Скрин интеграция](https://github.com/Snoubort/Game-Servases-Lab3/blob/main/MatForReadMe/YGBuild.PNG?raw=true "Интеграция")
-- Билд яндекса упаковываем в zip, после чего загружаем через панель разработчика яндекс и ждём окончания проверки(не забываем перезагружать страницу, ибо иначе состояние проверки не обновится)
-![Скрин интеграция](https://github.com/Snoubort/Game-Servases-Lab3/blob/main/MatForReadMe/YGConsole.PNG?raw=true "Интеграция")
-- Проходим по ссылке, ждём загрузки, играем
-![Скрин интеграция](https://github.com/Snoubort/Game-Servases-Lab3/blob/main/MatForReadMe/YGPlay.PNG?raw=true "Интеграция")
+### Добавить в меню Option возможность изменения громкости (от 0 до 100%) фоновой музыки в игре.
+- Создаём в меню настроек слайдер, привязываем к его изменению изменение параметра Volume в AudioSource
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/Music.PNG)
