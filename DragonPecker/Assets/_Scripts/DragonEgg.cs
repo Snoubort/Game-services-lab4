@@ -5,7 +5,8 @@ using UnityEngine;
 public class DragonEgg : MonoBehaviour
 {
     public static float bottomY = -30f;
-    // Start is called before the first frame update
+    public AudioSource audioSource;
+
     void Start()
     {
         
@@ -19,6 +20,9 @@ public class DragonEgg : MonoBehaviour
         Renderer rend;
         rend = GetComponent<Renderer>();
         rend.enabled = false;
+
+        audioSource = GetComponent<AudioSource>();
+        audioSource.Play();
     }
 
     // Update is called once per frame

@@ -6,6 +6,7 @@ using TMPro;
 public class EnergyShield : MonoBehaviour
 {
     public TextMeshProUGUI scoreGT;
+    public AudioSource audioSource;
 
     void Start() {
         GameObject scoreGO = GameObject.Find("Score");
@@ -30,5 +31,8 @@ public class EnergyShield : MonoBehaviour
         int score = int.Parse(scoreGT.text);
         score +=1;
         scoreGT.text = score.ToString();
+        
+        audioSource = GetComponent<AudioSource>();
+        audioSource.Play();
     }
 }
