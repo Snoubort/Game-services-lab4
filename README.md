@@ -36,6 +36,8 @@
 
         public class MainMenu : MonoBehaviour
         {
+            public AudioSource backgroundMusic;
+
             public void PlayGame(){
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
             }
@@ -43,7 +45,12 @@
             public void QuitGame(){
                 Application.Quit();
             }
+
+            public void SaveSound(){
+                Dataholder.soundLevel = backgroundMusic.volume;
+            }
         }
+
 
 
 - Добавляем обе сцены в сборку
@@ -158,7 +165,75 @@
 
 ## Задание 2
 ### Привести описание того, как происходит сборка проекта проекта под другие платформы. Какие могут быть особенности?
+- Проект может быть собран под разные платформы.
+- В зависимости от платформы может варьироваться тип запускаемого файла.
+- Основной особенности сборки проекта с использованием игровых сервисов является правильное соотношение платформы сборки и платформы под которую рассчитан плагин компании-поставщика сервисов.
+- Помимо непосредственно платформы так же важен Template.
+- К примеру - если мы будем собирать проект с использованием игровых сервисов яндекс игр, но при этом не будем использовать сборку под WebGl или же будем делать сборку не на том темплейте игровые сервисы попросту не будут работать.
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/BuildAndTemplate.PNG)
+
 ## Задание 3
 ### Добавить в меню Option возможность изменения громкости (от 0 до 100%) фоновой музыки в игре.
 - Создаём в меню настроек слайдер, привязываем к его изменению изменение параметра Volume в AudioSource
 ![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/Music.PNG)
+- К изменению этого слайдера привязываем функцию в MainMenu, которая при своём вызове будет сохранять значение Volume на MeinCamera в статическую переменную статического класса.
+
+
+
+        public static class Dataholder
+        {
+            public static float soundLevel;
+        }
+
+
+- Значение в статическом классе не теряется при смене сцен, по этому при старте игровой сцены берём значение из переменной и присваеваем его громкости проигрывателя фоновой музыки.
+
+
+
+        public class DragonPicker : MonoBehaviour
+        {
+            public GameObject energyShieldPrefab;
+            public int numEnergyShield = 3;
+            public float energyShieldBottomY = -6f;
+            public float energyShieldRadius = 1.5f;
+
+            public List<GameObject> shieldList;
+
+            public AudioSource backgroundMusic;
+
+            void Start()
+            {
+                backgroundMusic.volume = Dataholder.soundLevel;
+
+                shieldList = new List<GameObject>();
+                for (int i = 1; i<= numEnergyShield; i++){
+                    GameObject tShieldGo = Instantiate<GameObject>(energyShieldPrefab);
+                    tShieldGo.transform.position = new Vector3(0, energyShieldBottomY, 0);
+                    tShieldGo.transform.localScale = new Vector3(1*i, 1*i, 1*i);
+                    shieldList.Add(tShieldGo);
+                }
+            }
+
+            // Update is called once per frame
+            void Update()
+            {
+
+            }
+
+            public void DragonEggDestroyd(){
+                GameObject[] tDragonEggArray = GameObject.FindGameObjectsWithTag("Dragon Egg");
+                foreach (GameObject tGO in tDragonEggArray){
+                    Destroy(tGO);
+                }
+
+                int shieldIndex = shieldList.Count -1;
+                GameObject tShieldGo = shieldList[shieldIndex];
+                shieldList.RemoveAt(shieldIndex);
+                Destroy(tShieldGo);
+
+                if (shieldList.Count == 0){
+                    SceneManager.LoadScene("_0Scene");
+                }
+            }
+        }
+
