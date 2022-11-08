@@ -544,6 +544,7 @@ MonoBehaviour:
   energyShieldBottomY: -6
   energyShieldRadius: 1.5
   shieldList: []
+  backgroundMusic: {fileID: 963194231}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0

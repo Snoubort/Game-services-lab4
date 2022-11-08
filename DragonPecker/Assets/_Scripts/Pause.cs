@@ -10,7 +10,7 @@ public class Pause : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKey(KeyCode.Space)){
+        if(Input.GetKeyDown(KeyCode.Space)){
             if (!paused){
                 Time.timeScale = 0;
                 paused = true;

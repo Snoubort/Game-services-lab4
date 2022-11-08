@@ -9,11 +9,15 @@ public class DragonPicker : MonoBehaviour
     public int numEnergyShield = 3;
     public float energyShieldBottomY = -6f;
     public float energyShieldRadius = 1.5f;
-    
+
     public List<GameObject> shieldList;
 
+    public AudioSource backgroundMusic;
+    
     void Start()
     {
+        backgroundMusic.volume = Dataholder.soundLevel;
+
         shieldList = new List<GameObject>();
         for (int i = 1; i<= numEnergyShield; i++){
             GameObject tShieldGo = Instantiate<GameObject>(energyShieldPrefab);
@@ -34,6 +38,7 @@ public class DragonPicker : MonoBehaviour
         foreach (GameObject tGO in tDragonEggArray){
             Destroy(tGO);
         }
+        
         int shieldIndex = shieldList.Count -1;
         GameObject tShieldGo = shieldList[shieldIndex];
         shieldList.RemoveAt(shieldIndex);
