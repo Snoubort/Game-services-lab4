@@ -20,7 +20,7 @@
 ### - 5 Практическая работа «Добавление персонажа и сборка сцены для публикации на web-ресурсе».
 Ход работы:
 ![Uploading MenuAnimation.gif…]()
-![https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/MenuAnimation.gif]()
+![image](https://github.com/Snoubort/Game-services-lab4/blob/main/MatForReadMe/MenuAnimation.gif)
 - Создаём скрипт EnergyShield
 - В скрипте щита добавляем управление щитом при помощи движения мыши
 - Создадим холст, в верхний правый угол добавим счётчик
